@@ -19,19 +19,19 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(@Req() req) {
-    const loggedUser = await this.userService.findOne(req.user.id);
+    const loggedUser = await this.usersService.findOne(req.user.id);
     if (!loggedUser.isAdmin) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...filteredUser } = loggedUser;
       return [filteredUser];
     }
 
-    const users = await this.userService.findAll();
+    const users = await this.usersService.findAll();
     return users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...filteredUser } = user;
@@ -42,12 +42,12 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Req() req, @Param('id') id: string) {
-    const loggedUser = await this.userService.findOne(req.user.id);
+    const loggedUser = await this.usersService.findOne(req.user.id);
     if (!loggedUser.isAdmin && req.user.id !== +id) {
       throw new UnauthorizedException('Only admin can get other users!');
     }
 
-    const user = await this.userService.findOne(+id);
+    const user = await this.usersService.findOne(+id);
 
     if (!user) {
       throw new NotFoundException('User does not exist!');
@@ -62,16 +62,16 @@ export class UserController {
   @Put()
   @HttpCode(201)
   async create(@Req() req, @Body() payload: UserDto) {
-    const loggedUser = await this.userService.findOne(req.user.id);
+    const loggedUser = await this.usersService.findOne(req.user.id);
     if (!loggedUser.isAdmin) {
       throw new UnauthorizedException('Only admin can create users!');
     }
 
-    const hashedPassword = await this.userService.hashPassword(
+    const hashedPassword = await this.usersService.hashPassword(
       payload.password,
     );
 
-    const createdUser = await this.userService.create({
+    const createdUser = await this.usersService.create({
       ...payload,
       password: hashedPassword,
     });
@@ -87,7 +87,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() payload: PartialUserDto,
   ): Promise<any> {
-    const loggedUser = await this.userService.findOne(req.user.id);
+    const loggedUser = await this.usersService.findOne(req.user.id);
     if (!loggedUser.isAdmin) {
       if (req.user.id !== +id) {
         throw new UnauthorizedException('Only admin can update other users!');
@@ -97,10 +97,10 @@ export class UserController {
       }
     }
 
-    const hashedPassword = await this.userService.hashPassword(
+    const hashedPassword = await this.usersService.hashPassword(
       payload.password,
     );
-    const { affectedCount, updatedUser } = await this.userService.update(+id, {
+    const { affectedCount, updatedUser } = await this.usersService.update(+id, {
       ...payload,
       password: hashedPassword,
     });
@@ -118,12 +118,12 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   async delete(@Req() req, @Param('id') id: string) {
-    const loggedUser = await this.userService.findOne(req.user.id);
+    const loggedUser = await this.usersService.findOne(req.user.id);
     if (!loggedUser.isAdmin) {
       throw new UnauthorizedException('Only admin can delete users!');
     }
 
-    const deletedCount = await this.userService.delete(+id);
+    const deletedCount = await this.usersService.delete(+id);
     if (!deletedCount) {
       throw new NotFoundException('No user deleted!');
     }

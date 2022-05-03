@@ -42,8 +42,7 @@ export class ExerciceSetsController {
   @UseGuards(AuthGuard('jwt'))
   @Put()
   async create(@Req() req, @Body() exerciceSet: ExerciceSetDto) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can create exercice sets');
     }
     return await this.exerciceSetsService.create(exerciceSet);
@@ -56,8 +55,7 @@ export class ExerciceSetsController {
     @Param('id') id: number,
     @Body() exerciceSet: PartialExerciceSetDto,
   ) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can update exercice sets');
     }
 
@@ -72,8 +70,7 @@ export class ExerciceSetsController {
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Req() req, @Param('id') id: number): Promise<any> {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can delete exercice sets');
     }
 

@@ -11,12 +11,24 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Req() req) {
-    return await this.authService.login(req.user);
+    const { user, token } = await this.authService.login(req.user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...filteredUser } = user;
+    return { filteredUser, token };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
+  async logout(@Req() req) {
+    await this.authService.logout(req.user);
   }
 
   @UseGuards(DoesUserExist)
   @Post('register')
-  async register(@Body() user: UserDto) {
-    return await this.authService.register(user);
+  async register(@Body() payload: UserDto) {
+    const { user, token } = await this.authService.register(payload);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...filteredUser } = user;
+    return { filteredUser, token };
   }
 }

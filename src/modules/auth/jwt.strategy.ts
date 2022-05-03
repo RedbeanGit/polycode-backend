@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { UsersService } from '../users/users.service';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -14,13 +14,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.usersService.findOne(payload.id);
+    const session = await this.authService.getSession(payload.token);
 
-    if (!user) {
+    if (!session) {
       throw new UnauthorizedException();
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { iat, exp, ...filteredPayload } = payload;
-    return filteredPayload;
+
+    if (this.isExpired(session)) {
+      await this.authService.deleteSession(session.token);
+      throw new UnauthorizedException();
+    }
+    return session.user ? session.user['dataValues'] : session.user;
+  }
+
+  private isExpired(session: any) {
+    const now = new Date();
+    return now > session.expireAt;
   }
 }

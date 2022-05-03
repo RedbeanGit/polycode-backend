@@ -6,6 +6,7 @@ import {
   HasMany,
   BelongsToMany,
 } from 'sequelize-typescript';
+import { Session } from '../auth/auth.entity';
 import {
   ExerciceSet,
   ExerciceSetProgress,
@@ -46,4 +47,7 @@ export class User extends Model {
 
   @BelongsToMany(() => ExerciceSet, () => ExerciceSetProgress)
   exerciceSetsProgress: ExerciceSetProgress[];
+
+  @HasMany(() => Session)
+  sessions: Session[];
 }

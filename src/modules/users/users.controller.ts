@@ -24,10 +24,9 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(@Req() req) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...filteredUser } = loggedUser;
+      const { password, ...filteredUser } = req.user;
       return [filteredUser];
     }
 
@@ -42,8 +41,7 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Req() req, @Param('id') id: string) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin && req.user.id !== +id) {
+    if (!req.user.isAdmin && req.user.id !== +id) {
       throw new UnauthorizedException('Only admin can get other users!');
     }
 
@@ -62,8 +60,7 @@ export class UserController {
   @Put()
   @HttpCode(201)
   async create(@Req() req, @Body() payload: UserDto) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can create users!');
     }
 
@@ -87,8 +84,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() payload: PartialUserDto,
   ): Promise<any> {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       if (req.user.id !== +id) {
         throw new UnauthorizedException('Only admin can update other users!');
       }
@@ -118,8 +114,7 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   async delete(@Req() req, @Param('id') id: string) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can delete users!');
     }
 

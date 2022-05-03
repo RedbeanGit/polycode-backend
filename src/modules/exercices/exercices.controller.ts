@@ -14,7 +14,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
 import { ExerciceDto, PartialExerciceDto } from './dto/exercice.dto';
-import { Exercice } from './exercices.entity';
 import { ExercicesService } from './exercices.service';
 
 @Controller('exercices')
@@ -43,8 +42,7 @@ export class ExercicesController {
   @UseGuards(AuthGuard('jwt'))
   @Put()
   async create(@Req() req, @Body() exercice: ExerciceDto) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can create exercices');
     }
     return await this.exercicesService.create(exercice);
@@ -56,8 +54,7 @@ export class ExercicesController {
     @Param('id') id: number,
     @Body() exercice: PartialExerciceDto,
   ) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can update exercices');
     }
 
@@ -73,8 +70,7 @@ export class ExercicesController {
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Req() req, @Param('id') id: number) {
-    const loggedUser = await this.usersService.findOne(req.user.id);
-    if (!loggedUser.isAdmin) {
+    if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can delete exercices');
     }
 

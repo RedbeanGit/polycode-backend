@@ -1,4 +1,5 @@
 export const SEQUELIZE = 'SEQUELIZE';
+export const DOCKER = 'DOCKER';
 
 export const DEVELOPMENT = 'development';
 export const TEST = 'test';

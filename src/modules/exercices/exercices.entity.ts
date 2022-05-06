@@ -20,6 +20,9 @@ export class Exercice extends Model {
   @Column
   baseEditorContent: string;
 
+  @Column
+  expectedOutput: string;
+
   // associations
   @ForeignKey(() => User)
   @Column

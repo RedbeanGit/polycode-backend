@@ -7,6 +7,9 @@ export class ExerciceDto {
   @IsNotEmpty()
   readonly statement: string;
 
+  @IsNotEmpty()
+  readonly expectedOutput: string;
+
   readonly baseEditorContent: string;
 
   @IsNotEmpty()
@@ -19,6 +22,7 @@ export class ExerciceDto {
 export class PartialExerciceDto {
   readonly name: string;
   readonly statement: string;
+  readonly expectedOutput: string;
   readonly baseEditorContent: string;
   readonly creatorId: number;
   readonly exerciceSetId: number;

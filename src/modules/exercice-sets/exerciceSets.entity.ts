@@ -11,8 +11,8 @@ import { Exercice } from '../exercices/exercices.entity';
 import { User } from '../users/users.entity';
 
 export enum ExerciceSetType {
-  CHALLENGE = 'CHALLENGE',
-  PRACTICE = 'PRACTICE',
+  CHALLENGE = 'challenge',
+  PRACTICE = 'practice',
 }
 
 @Table

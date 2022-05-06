@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { Session } from '../../modules/auth/auth.entity';
 import {
   ExerciceSet,
@@ -9,14 +9,15 @@ import {
   ExerciceProgress,
 } from '../../modules/exercices/exercices.entity';
 import { User } from '../../modules/users/users.entity';
-import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
+import { DEVELOPMENT, PRODUCTION, SEQUELIZE, TEST } from '../constants';
 import { databaseConfig } from './database.config';
+import { IDatabaseConfigAttributes } from './interfaces/dbConfig.interface';
 
 export const databaseProviders = [
   {
     provide: SEQUELIZE,
-    useFactory: async () => {
-      let config;
+    useFactory: async (): Promise<Sequelize> => {
+      let config: IDatabaseConfigAttributes;
       switch (process.env.NODE_ENV) {
         case DEVELOPMENT:
           config = databaseConfig.development;
@@ -30,7 +31,10 @@ export const databaseProviders = [
         default:
           config = databaseConfig.development;
       }
-      const sequelize = new Sequelize({ ...config, logging: false });
+      const sequelize = new Sequelize({
+        ...config,
+        logging: false,
+      } as SequelizeOptions);
       sequelize.addModels([
         ExerciceSet,
         ExerciceSetProgress,

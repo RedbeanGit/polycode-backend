@@ -8,7 +8,10 @@ import {
 
 @Injectable()
 export class ValidateInputPipe extends ValidationPipe {
-  public async transform(value, metadata: ArgumentMetadata) {
+  public async transform<T>(
+    value: T,
+    metadata: ArgumentMetadata,
+  ): Promise<any> {
     try {
       return await super.transform(value, metadata);
     } catch (error) {

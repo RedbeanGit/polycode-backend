@@ -18,7 +18,7 @@ export class DoesUserExist implements CanActivate {
     return this.validateRequest(request);
   }
 
-  async validateRequest(request: any): Promise<boolean> {
+  async validateRequest(request): Promise<boolean> {
     if (!request.body.email) {
       return true;
     }

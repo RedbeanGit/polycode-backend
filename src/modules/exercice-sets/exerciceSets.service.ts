@@ -21,7 +21,11 @@ export class ExerciceSetsService {
       where: { id },
       attributes: { exclude: ['creatorId'] },
       include: [
-        { model: Exercice },
+        {
+          model: Exercice,
+          as: 'exercices',
+          attributes: { exclude: ['expectedOutput'] },
+        },
         {
           model: User,
           as: 'creator',
@@ -35,7 +39,10 @@ export class ExerciceSetsService {
     return await this.exerciceSetsRepository.create({ ...exerciceSet });
   }
 
-  async update(id: number, exerciceSet: PartialExerciceSetDto) {
+  async update(
+    id: number,
+    exerciceSet: PartialExerciceSetDto,
+  ): Promise<{ affectedCount: number; updatedExerciceSet: ExerciceSet }> {
     const [affectedCount, [res]] = await this.exerciceSetsRepository.update(
       exerciceSet,
       {

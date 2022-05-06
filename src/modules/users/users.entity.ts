@@ -48,6 +48,6 @@ export class User extends Model {
   @BelongsToMany(() => ExerciceSet, () => ExerciceSetProgress)
   exerciceSetsProgress: ExerciceSetProgress[];
 
-  @HasMany(() => Session)
+  @HasMany(() => Session, { onDelete: 'CASCADE' })
   sessions: Session[];
 }

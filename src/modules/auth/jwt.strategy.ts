@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { User } from '../users/users.entity';
+import { Session } from './auth.entity';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -13,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: { token: string; expireAt: Date }): Promise<User> {
     const session = await this.authService.getSession(payload.token);
 
     if (!session) {
@@ -27,7 +29,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return session.user ? session.user['dataValues'] : session.user;
   }
 
-  private isExpired(session: any) {
+  private isExpired(session: Session): boolean {
     const now = new Date();
     return now > session.expireAt;
   }

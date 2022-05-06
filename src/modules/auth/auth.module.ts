@@ -14,7 +14,7 @@ import { authProviders } from './auth.providers';
     UsersModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.TOKEN_EXPIRATION },
+      signOptions: { expiresIn: Number(process.env.TOKEN_EXPIRATION) },
     }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, ...authProviders],

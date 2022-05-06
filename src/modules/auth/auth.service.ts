@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { SESSION_REPOSITORY } from '../../core/constants';
 import { Session } from './auth.entity';
 import { User } from '../users/users.entity';
+import { UserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,32 +17,32 @@ export class AuthService {
     private readonly sessionsRepository: typeof Session,
   ) {}
 
-  public async login(user) {
+  public async login(user: User): Promise<{ user: User; token: string }> {
     const loggedUser = await this.usersService.updateLastLogin(user.id);
     const token = await this.generateSession(loggedUser);
     return { user: loggedUser, token };
   }
 
-  public async logout(user) {
+  public async logout(user: User): Promise<void> {
     await this.sessionsRepository.destroy({ where: { userId: user.id } });
   }
 
-  public async register(payload): Promise<any> {
-    // create a new user
+  public async register(
+    payload: UserDto,
+  ): Promise<{ user: User; token: string }> {
     const pass = await this.usersService.hashPassword(payload.password);
     const newUser = await this.usersService.create({
       ...payload,
-      lastLogin: Date.now(),
+      lastLogin: new Date(),
       password: pass,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const token = await this.generateSession(newUser);
 
     return { user: newUser, token };
   }
 
   // utilitary methods
-  async validateUser(email: string, pwd: string): Promise<any> {
+  async validateUser(email: string, pwd: string): Promise<User> {
     // Get user from email
     const user = await this.usersService.findOneByEmail(email);
 
@@ -64,7 +65,7 @@ export class AuthService {
   }
 
   // sessions
-  public async generateSession(user: User) {
+  public async generateSession(user: User): Promise<string> {
     const token = uuidv4();
     const expireAt = this.createSessionExpirationDate();
     this.sessionsRepository.create({
@@ -78,11 +79,11 @@ export class AuthService {
     });
   }
 
-  public async deleteSession(token: string) {
+  public async deleteSession(token: string): Promise<void> {
     await this.sessionsRepository.destroy({ where: { token } });
   }
 
-  public async getSession(token: string) {
+  public async getSession(token: string): Promise<Session> {
     const res = await this.sessionsRepository.findOne({
       where: { token },
       include: [{ model: User }],
@@ -90,7 +91,7 @@ export class AuthService {
     return res ? res['dataValues'] : res;
   }
 
-  private createSessionExpirationDate() {
+  private createSessionExpirationDate(): Date {
     const date = new Date();
     date.setSeconds(date.getSeconds() + Number(process.env.TOKEN_EXPIRATION));
     return date;

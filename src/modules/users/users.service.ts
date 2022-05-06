@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from './users.entity';
 import { USER_REPOSITORY } from '../../core/constants';
-import { UserDto } from './dto/user.dto';
+import { PartialUserDto, UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -33,7 +33,10 @@ export class UsersService {
     return res ? res['dataValues'] : res;
   }
 
-  async update(id: number, user: UserDto) {
+  async update(
+    id: number,
+    user: PartialUserDto,
+  ): Promise<{ affectedCount: number; updatedUser: User }> {
     const [affectedCount, [res]] = await this.usersRespository.update<User>(
       user,
       {

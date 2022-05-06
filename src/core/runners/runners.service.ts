@@ -3,10 +3,10 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DOCKER } from '../constants';
 
 class RunnerBuffer {
-  private buffer: string;
+  private buffer = '';
 
-  write(data: string) {
-    this.buffer = data.toString();
+  write(data: any): void {
+    this.buffer += data.toString();
   }
 
   getBuffer(): string {
@@ -23,7 +23,11 @@ export interface EditorContent {
 export class RunnersService {
   constructor(@Inject(DOCKER) private readonly docker: typeof Docker) {}
 
-  async run(image: string, command: string, editorsContent: EditorContent[]) {
+  async run(
+    image: string,
+    command: string,
+    editorsContent: EditorContent[],
+  ): Promise<{ stdout: string; stderr: string }> {
     const editorsCommand = editorsContent
       .map(
         (editorContent) =>

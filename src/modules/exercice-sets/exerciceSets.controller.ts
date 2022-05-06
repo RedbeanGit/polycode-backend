@@ -14,6 +14,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
 import { ExerciceSetDto, PartialExerciceSetDto } from './dto/exerciceSet.dto';
+import { ExerciceSet } from './exerciceSets.entity';
 import { ExerciceSetsService } from './exerciceSets.service';
 
 @Controller('exercice-sets')
@@ -25,13 +26,13 @@ export class ExerciceSetsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll() {
+  async findAll(): Promise<ExerciceSet[]> {
     return await this.exerciceSetsService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: number): Promise<ExerciceSet> {
     const exerciceSet = await this.exerciceSetsService.findOne(id);
     if (!exerciceSet) {
       throw new NotFoundException();
@@ -41,7 +42,10 @@ export class ExerciceSetsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Put()
-  async create(@Req() req, @Body() exerciceSet: ExerciceSetDto) {
+  async create(
+    @Req() req: any,
+    @Body() exerciceSet: ExerciceSetDto,
+  ): Promise<ExerciceSet> {
     if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can create exercice sets');
     }
@@ -51,10 +55,10 @@ export class ExerciceSetsController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(
-    @Req() req,
+    @Req() req: any,
     @Param('id') id: number,
     @Body() exerciceSet: PartialExerciceSetDto,
-  ) {
+  ): Promise<ExerciceSet> {
     if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can update exercice sets');
     }
@@ -69,7 +73,7 @@ export class ExerciceSetsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  async delete(@Req() req, @Param('id') id: number): Promise<any> {
+  async delete(@Req() req: any, @Param('id') id: number): Promise<void> {
     if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can delete exercice sets');
     }

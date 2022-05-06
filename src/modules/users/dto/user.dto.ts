@@ -16,6 +16,7 @@ export class UserDto {
   readonly password: string;
 
   readonly isAdmin: boolean;
+  readonly lastLogin: Date;
 }
 
 export class PartialUserDto {

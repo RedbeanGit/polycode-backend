@@ -15,6 +15,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
 import { PartialUserDto, UserDto } from './dto/user.dto';
+import { User } from './users.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -23,24 +24,22 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(@Req() req) {
+  async findAll(@Req() req: any): Promise<User[]> {
     if (!req.user.isAdmin) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...filteredUser } = req.user;
-      return [filteredUser];
+      req.user.password = undefined;
+      return [req.user];
     }
 
     const users = await this.usersService.findAll();
     return users.map((user) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...filteredUser } = user;
-      return filteredUser;
+      user.password = undefined;
+      return user;
     });
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Req() req, @Param('id') id: string) {
+  async findOne(@Req() req: any, @Param('id') id: string): Promise<User> {
     if (!req.user.isAdmin && req.user.id !== +id) {
       throw new UnauthorizedException('Only admin can get other users!');
     }
@@ -51,15 +50,14 @@ export class UserController {
       throw new NotFoundException('User does not exist!');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...filteredUser } = user;
-    return filteredUser;
+    user.password = undefined;
+    return user;
   }
 
   @UseGuards(AuthGuard('jwt'), DoesUserExist)
   @Put()
   @HttpCode(201)
-  async create(@Req() req, @Body() payload: UserDto) {
+  async create(@Req() req: any, @Body() payload: UserDto): Promise<User> {
     if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can create users!');
     }
@@ -72,18 +70,18 @@ export class UserController {
       ...payload,
       password: hashedPassword,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...filteredUser } = createdUser;
-    return filteredUser;
+
+    createdUser.password = undefined;
+    return createdUser;
   }
 
   @UseGuards(AuthGuard('jwt'), DoesUserExist)
   @Patch(':id')
   async update(
-    @Req() req,
+    @Req() req: any,
     @Param('id') id: string,
     @Body() payload: PartialUserDto,
-  ): Promise<any> {
+  ): Promise<User> {
     if (!req.user.isAdmin) {
       if (req.user.id !== +id) {
         throw new UnauthorizedException('Only admin can update other users!');
@@ -105,15 +103,14 @@ export class UserController {
       throw new NotFoundException('No user updated!');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...filteredUser } = updatedUser;
-    return filteredUser;
+    updatedUser.password = undefined;
+    return updatedUser;
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Req() req, @Param('id') id: string) {
+  async delete(@Req() req: any, @Param('id') id: string): Promise<void> {
     if (!req.user.isAdmin) {
       throw new UnauthorizedException('Only admin can delete users!');
     }

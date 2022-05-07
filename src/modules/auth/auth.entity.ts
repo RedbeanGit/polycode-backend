@@ -22,3 +22,19 @@ export class Session extends Model {
   @Column
   expireAt: Date;
 }
+
+@Table
+export class VerificationCode extends Model {
+  @Column({ primaryKey: true })
+  token: string;
+
+  @ForeignKey(() => User)
+  @Column
+  userId: number;
+
+  @BelongsTo(() => User)
+  user: User;
+
+  @Column
+  expireAt: Date;
+}

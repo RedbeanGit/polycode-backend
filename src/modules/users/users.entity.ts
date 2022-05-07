@@ -5,8 +5,9 @@ import {
   Unique,
   HasMany,
   BelongsToMany,
+  HasOne,
 } from 'sequelize-typescript';
-import { Session } from '../auth/auth.entity';
+import { Session, VerificationCode } from '../auth/auth.entity';
 import {
   ExerciceSet,
   ExerciceSetProgress,
@@ -27,6 +28,9 @@ export class User extends Model {
 
   @Column
   password: string;
+
+  @Column
+  isVerified: boolean;
 
   @Column
   lastLogin: Date;
@@ -50,4 +54,7 @@ export class User extends Model {
 
   @HasMany(() => Session, { onDelete: 'CASCADE' })
   sessions: Session[];
+
+  @HasOne(() => VerificationCode, { onDelete: 'CASCADE' })
+  verificationCode: VerificationCode;
 }

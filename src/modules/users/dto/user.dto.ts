@@ -16,6 +16,8 @@ export class UserDto {
   readonly password: string;
 
   readonly isAdmin: boolean;
+  readonly isVerified: boolean;
+  readonly verificationCode: number;
   readonly lastLogin: Date;
 }
 
@@ -24,5 +26,7 @@ export class PartialUserDto {
   readonly lastname: string;
   readonly email: string;
   readonly password: string;
+  readonly isVerified: boolean;
+  readonly verificationCode: number;
   readonly isAdmin: boolean;
 }

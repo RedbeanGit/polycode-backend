@@ -27,12 +27,14 @@ export class UserController {
   async findAll(@Req() req: any): Promise<User[]> {
     if (!req.user.isAdmin) {
       req.user.password = undefined;
+      req.user.verificationCode = undefined;
       return [req.user];
     }
 
     const users = await this.usersService.findAll();
     return users.map((user) => {
       user.password = undefined;
+      user.verificationCode = undefined;
       return user;
     });
   }
@@ -51,6 +53,7 @@ export class UserController {
     }
 
     user.password = undefined;
+    user.verificationCode = undefined;
     return user;
   }
 
@@ -72,6 +75,7 @@ export class UserController {
     });
 
     createdUser.password = undefined;
+    createdUser.verificationCode = undefined;
     return createdUser;
   }
 
@@ -104,6 +108,7 @@ export class UserController {
     }
 
     updatedUser.password = undefined;
+    updatedUser.verificationCode = undefined;
     return updatedUser;
   }
 

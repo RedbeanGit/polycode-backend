@@ -16,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { token: string; expireAt: Date }): Promise<User> {
-    const session = await this.authService.getSession(payload.token);
+    const session = await this.authService.findOneSession(payload.token);
 
     if (!session) {
       throw new UnauthorizedException();
@@ -26,7 +26,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       await this.authService.deleteSession(session.token);
       throw new UnauthorizedException();
     }
-    return session.user ? session.user['dataValues'] : session.user;
+
+    if (!session.user.isVerified) {
+      throw new UnauthorizedException('Unverified user');
+    }
+
+    return session.user;
   }
 
   private isExpired(session: Session): boolean {

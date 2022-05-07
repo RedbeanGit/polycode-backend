@@ -29,7 +29,11 @@ export class UsersService {
   }
 
   async create(user: UserDto): Promise<User> {
-    const res = await this.usersRespository.create<User>({ ...user });
+    const pass = await this.hashPassword(user.password);
+    const res = await this.usersRespository.create<User>({
+      ...user,
+      password: pass,
+    });
     return res ? res['dataValues'] : res;
   }
 

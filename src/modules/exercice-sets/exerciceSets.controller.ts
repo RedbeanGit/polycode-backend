@@ -19,10 +19,7 @@ import { ExerciceSetsService } from './exerciceSets.service';
 
 @Controller('exercice-sets')
 export class ExerciceSetsController {
-  constructor(
-    private readonly exerciceSetsService: ExerciceSetsService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly exerciceSetsService: ExerciceSetsService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get()

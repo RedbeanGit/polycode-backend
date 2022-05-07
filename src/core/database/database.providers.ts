@@ -1,5 +1,5 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
-import { Session } from '../../modules/auth/auth.entity';
+import { Session, VerificationCode } from '../../modules/auth/auth.entity';
 import {
   ExerciceSet,
   ExerciceSetProgress,
@@ -41,6 +41,7 @@ export const databaseProviders = [
         Exercice,
         ExerciceProgress,
         Session,
+        VerificationCode,
         User,
       ]);
       await sequelize.sync();

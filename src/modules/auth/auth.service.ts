@@ -43,11 +43,11 @@ export class AuthService {
   }
 
   public async findOneSession(token: string) {
-    return await this.sessionsRepository.findOne({
+    const res = await this.sessionsRepository.findOne({
       where: { token },
       include: [{ model: User }],
-      raw: true,
     });
+    return res ? res['dataValues'] : res;
   }
 
   public async deleteSession(token: string): Promise<void> {

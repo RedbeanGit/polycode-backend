@@ -27,11 +27,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    if (!session.user.isVerified) {
+    const user = session.user['dataValues'];
+
+    if (!user.isVerified) {
       throw new UnauthorizedException('Unverified user');
     }
 
-    return session.user;
+    return user;
   }
 
   private isExpired(session: Session): boolean {

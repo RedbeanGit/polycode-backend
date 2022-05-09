@@ -23,7 +23,7 @@ export class Session extends Model {
   expireAt: Date;
 }
 
-@Table
+@Table({ timestamps: false })
 export class VerificationCode extends Model {
   @Column({ primaryKey: true })
   token: string;

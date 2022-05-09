@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { DoesUserExist } from '../../core/guards/doesUserExist.guard';
 import { UserDto } from '../users/dto/user.dto';
@@ -43,6 +43,14 @@ export class AuthController {
     user.password = undefined;
     user.verificationCode = undefined;
     return user;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  async me(@Req() req: any): Promise<User> {
+    req.user.password = undefined;
+    req.user.verificationCode = undefined;
+    return req.user;
   }
 
   @Post('verify')

@@ -12,7 +12,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from '../users/users.service';
 import { ExerciceSetDto, PartialExerciceSetDto } from './dto/exerciceSet.dto';
 import { ExerciceSet } from './exerciceSets.entity';
 import { ExerciceSetsService } from './exerciceSets.service';
@@ -79,5 +78,13 @@ export class ExerciceSetsController {
     if (!deletedCount) {
       throw new NotFoundException();
     }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/spotlight')
+  async findSpotlight(): Promise<ExerciceSet> {
+    const exerciceSets = await this.exerciceSetsService.findAll();
+    const randomIndex = Math.floor(Math.random() * exerciceSets.length);
+    return exerciceSets[randomIndex];
   }
 }

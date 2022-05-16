@@ -7,11 +7,14 @@ import {
   Param,
   Patch,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { query } from 'express';
+import { Paginated, parseOffsetAndLimit } from 'src/core/pagination';
 import { ExerciceSetDto, PartialExerciceSetDto } from './dto/exerciceSet.dto';
 import { ExerciceSet } from './exerciceSets.entity';
 import { ExerciceSetsService } from './exerciceSets.service';
@@ -21,9 +24,24 @@ export class ExerciceSetsController {
   constructor(private readonly exerciceSetsService: ExerciceSetsService) {}
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('spotlight')
+  async findSpotlight(): Promise<ExerciceSet> {
+    const { data, total } = await this.exerciceSetsService.findAll();
+    const randomIndex = Math.floor(Math.random() * total);
+    return data[randomIndex];
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(): Promise<ExerciceSet[]> {
-    return await this.exerciceSetsService.findAll();
+  async findAll(
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ): Promise<Paginated<ExerciceSet>> {
+    const parsedQuery = parseOffsetAndLimit(offset, limit);
+    return await this.exerciceSetsService.findAll(
+      parsedQuery.offset,
+      parsedQuery.limit,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -78,13 +96,5 @@ export class ExerciceSetsController {
     if (!deletedCount) {
       throw new NotFoundException();
     }
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Get('/spotlight')
-  async findSpotlight(): Promise<ExerciceSet> {
-    const exerciceSets = await this.exerciceSetsService.findAll();
-    const randomIndex = Math.floor(Math.random() * exerciceSets.length);
-    return exerciceSets[randomIndex];
   }
 }

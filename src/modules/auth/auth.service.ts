@@ -133,18 +133,15 @@ export class AuthService {
       user.email,
       'Verify your account',
       `Please visit the following link to verify your account: ${process.env.APP_URL}/verify/${token}`,
-      `<h1>Polycode account verification</h1><a href="${process.env.APP_URL}/verify/${token}">Verify your account</a>`,
+      `<h1>Polycode account verification</h1><a href="${process.env.APP_URL}/verify?code=${token}">Verify your account</a>`,
     );
   }
 
-  public async verify(email: string, token: string): Promise<User> {
+  public async verify(token: string): Promise<User> {
     const verificationCode = await this.findOneVerificationCode(token);
 
     if (!verificationCode) {
       throw new UnauthorizedException('Invalid verification code');
-    }
-    if (verificationCode.user.email != email) {
-      throw new UnauthorizedException('Invalid email');
     }
 
     // we don't need the verification code anymore

@@ -55,13 +55,10 @@ export class AuthController {
 
   @Post('verify')
   async verify(
-    @Body() payload: { email: string; code: string },
+    @Body() payload: { code: string },
   ): Promise<{ user: User; token: string }> {
-    const verifiedUser = await this.authService.verify(
-      payload.email,
-      payload.code,
-    );
-    return await this.login({ user: verifiedUser });
+    const user = await this.authService.verify(payload.code);
+    return await this.login({ user });
   }
 
   @Post('verify/resend')

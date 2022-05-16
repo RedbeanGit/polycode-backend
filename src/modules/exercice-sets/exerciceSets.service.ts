@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { Paginated } from 'src/core/pagination';
 import { EXERCICE_SET_REPOSITORY } from '../../core/constants';
 import { Exercice } from '../exercices/exercices.entity';
 import { User } from '../users/users.entity';
@@ -12,8 +13,16 @@ export class ExerciceSetsService {
     private readonly exerciceSetsRepository: typeof ExerciceSet,
   ) {}
 
-  async findAll(): Promise<ExerciceSet[]> {
-    return await this.exerciceSetsRepository.findAll();
+  async findAll(
+    offset?: number,
+    limit?: number,
+  ): Promise<Paginated<ExerciceSet>> {
+    const total = await this.exerciceSetsRepository.count();
+    const { rows, count } = await this.exerciceSetsRepository.findAndCountAll({
+      offset,
+      limit,
+    });
+    return new Paginated<ExerciceSet>(rows, count, total);
   }
 
   async findOne(id: number): Promise<ExerciceSet> {

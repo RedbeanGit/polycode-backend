@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { User } from './users.entity';
 import { USER_REPOSITORY } from '../../core/constants';
 import { PartialUserDto, UserDto } from './dto/user.dto';
+import { Paginated } from 'src/core/pagination';
 
 @Injectable()
 export class UsersService {
@@ -11,9 +12,17 @@ export class UsersService {
     private readonly usersRespository: typeof User,
   ) {}
 
-  async findAll(): Promise<User[]> {
-    const users = await this.usersRespository.findAll<User>();
-    return users.map((user) => user['dataValues']);
+  async findAll(offset?: number, limit?: number): Promise<Paginated<User>> {
+    const total = await this.usersRespository.count();
+    const { rows, count } = await this.usersRespository.findAndCountAll<User>({
+      offset,
+      limit,
+    });
+    return new Paginated(
+      rows.map((user) => user['dataValues']),
+      count,
+      total,
+    );
   }
 
   async findOne(id: number): Promise<User> {

@@ -8,11 +8,13 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Paginated, parseOffsetAndLimit } from 'src/core/pagination';
 import { RunnersService } from 'src/core/runners/runners.service';
 import { ExerciceDto, PartialExerciceDto } from './dto/exercice.dto';
 import { PartialExerciceProgressDto } from './dto/exerciceProgress.dto';
@@ -29,9 +31,16 @@ export class ExercicesController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(): Promise<Exercice[]> {
-    const exercices = await this.exercicesService.findAll();
-    return exercices.map((exercice) => {
+  async findAll(
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ): Promise<Paginated<Exercice>> {
+    const parsedQuery = parseOffsetAndLimit(offset, limit);
+    const paginated = await this.exercicesService.findAll(
+      parsedQuery.offset,
+      parsedQuery.limit,
+    );
+    return paginated.map<Exercice>((exercice) => {
       exercice.expectedOutput = undefined;
       return exercice;
     });

@@ -8,12 +8,14 @@ import {
   Param,
   Patch,
   Put,
+  Query,
   Req,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
+import { Paginated, parseOffsetAndLimit } from 'src/core/pagination';
 import { PartialUserDto, UserDto } from './dto/user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -24,15 +26,23 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(@Req() req: any): Promise<User[]> {
+  async findAll(
+    @Req() req: any,
+    @Query('offset') offset?: string,
+    @Query('limit') limit?: string,
+  ): Promise<Paginated<User>> {
     if (!req.user.isAdmin) {
       req.user.password = undefined;
       req.user.verificationCode = undefined;
-      return [req.user];
+      return new Paginated([req.user], 1, 1);
     }
 
-    const users = await this.usersService.findAll();
-    return users.map((user) => {
+    const parsedQuery = parseOffsetAndLimit(offset, limit);
+    const paginated = await this.usersService.findAll(
+      parsedQuery.offset,
+      parsedQuery.limit,
+    );
+    return paginated.map<User>((user) => {
       user.password = undefined;
       user.verificationCode = undefined;
       return user;

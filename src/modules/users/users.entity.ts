@@ -8,10 +8,7 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { Session, VerificationCode } from '../auth/auth.entity';
-import {
-  ExerciceSet,
-  ExerciceSetProgress,
-} from '../exercice-sets/exerciceSets.entity';
+import { ExerciceSet } from '../exercice-sets/exerciceSets.entity';
 import { Exercice, ExerciceProgress } from '../exercices/exercices.entity';
 
 @Table
@@ -47,10 +44,7 @@ export class User extends Model {
   exerciceSetsCreated: ExerciceSet[];
 
   @BelongsToMany(() => Exercice, () => ExerciceProgress)
-  exercicesProgress: ExerciceProgress[];
-
-  @BelongsToMany(() => ExerciceSet, () => ExerciceSetProgress)
-  exerciceSetsProgress: ExerciceSetProgress[];
+  exerciceProgress: Exercice[];
 
   @HasMany(() => Session, { onDelete: 'CASCADE' })
   sessions: Session[];

@@ -6,7 +6,6 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { authProviders } from './auth.providers';
 import { MailerModule } from 'src/core/mailer/mailer.module';
 import { MailerService } from 'src/core/mailer/mailer.service';
 
@@ -20,13 +19,7 @@ import { MailerService } from 'src/core/mailer/mailer.service';
       signOptions: { expiresIn: Number(process.env.TOKEN_EXPIRATION) },
     }),
   ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    MailerService,
-    ...authProviders,
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy, MailerService],
   controllers: [AuthController],
 })
 export class AuthModule {}

@@ -3,18 +3,13 @@ import { Inject, Injectable } from '@nestjs/common';
 import { User } from './users.entity';
 import { USER_REPOSITORY } from '../../core/constants';
 import { PartialUserDto, UserDto } from './dto/user.dto';
-import { Paginated } from 'src/core/pagination';
+import { Paginated } from '../../core/pagination';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @Inject(USER_REPOSITORY)
-    private readonly usersRespository: typeof User,
-  ) {}
-
   async findAll(offset?: number, limit?: number): Promise<Paginated<User>> {
-    const total = await this.usersRespository.count();
-    const { rows, count } = await this.usersRespository.findAndCountAll<User>({
+    const total = await User.count();
+    const { rows, count } = await User.findAndCountAll<User>({
       offset,
       limit,
     });
@@ -26,12 +21,12 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    const res = await this.usersRespository.findByPk<User>(id);
+    const res = await User.findByPk<User>(id);
     return res ? res['dataValues'] : res;
   }
 
   async findOneByEmail(email: string): Promise<User> {
-    const res = await this.usersRespository.findOne<User>({
+    const res = await User.findOne<User>({
       where: { email },
     });
     return res ? res['dataValues'] : res;
@@ -39,7 +34,7 @@ export class UsersService {
 
   async create(user: UserDto): Promise<User> {
     const pass = await this.hashPassword(user.password);
-    const res = await this.usersRespository.create<User>({
+    const res = await User.create<User>({
       ...user,
       password: pass,
     });
@@ -50,19 +45,16 @@ export class UsersService {
     id: number,
     user: PartialUserDto,
   ): Promise<{ affectedCount: number; updatedUser: User }> {
-    const [affectedCount, [res]] = await this.usersRespository.update<User>(
-      user,
-      {
-        where: { id },
-        returning: true,
-      },
-    );
+    const [affectedCount, [res]] = await User.update<User>(user, {
+      where: { id },
+      returning: true,
+    });
     const updatedUser = res ? res['dataValues'] : res;
     return { affectedCount, updatedUser };
   }
 
   async delete(id: number): Promise<number> {
-    return await this.usersRespository.destroy<User>({ where: { id } });
+    return await User.destroy<User>({ where: { id } });
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -73,7 +65,7 @@ export class UsersService {
   }
 
   async updateLastLogin(id: number): Promise<User> {
-    const [, [updatedUser]] = await this.usersRespository.update<User>(
+    const [, [updatedUser]] = await User.update<User>(
       { lastLogin: Date.now() },
       { where: { id }, returning: true },
     );

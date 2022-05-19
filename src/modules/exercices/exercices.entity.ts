@@ -32,7 +32,7 @@ export class Exercice extends Model {
   creator: User;
 
   @BelongsToMany(() => User, () => ExerciceProgress)
-  progress: ExerciceProgress[];
+  userProgress: User[];
 
   @ForeignKey(() => ExerciceSet)
   @Column
@@ -56,5 +56,5 @@ export class ExerciceProgress extends Model {
   editorContent: string;
 
   @Column
-  isDone: boolean;
+  success: boolean;
 }

@@ -145,7 +145,7 @@ export class ExercicesController {
     const { stdout, stderr } = await this.runnersService.run(image, command, [
       realEditorContent,
     ]);
-    const progress = this.exercicesService.getProgress(
+    const progress = await this.exercicesService.getProgress(
       exercice.id,
       req.user.id,
     );

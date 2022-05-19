@@ -14,29 +14,20 @@ import { Exercice, ExerciceProgress } from './exercices.entity';
 
 @Injectable()
 export class ExercicesService {
-  constructor(
-    @Inject(EXERCICE_REPOSITORY)
-    private readonly exerciceRepository: typeof Exercice,
-    @Inject(EXERCICE_PROGRESS_REPOSITORY)
-    private readonly exerciceProgressRepository: typeof ExerciceProgress,
-  ) {}
-
   async findAll(offset?: number, limit?: number): Promise<Paginated<Exercice>> {
-    const total = await this.exerciceRepository.count();
-    const { rows, count } =
-      await this.exerciceRepository.findAndCountAll<Exercice>({
-        offset,
-        limit,
-      });
+    const { rows, count } = await Exercice.findAndCountAll<Exercice>({
+      offset,
+      limit,
+    });
     return new Paginated(
       rows.map((exercice) => (exercice ? exercice['dataValues'] : exercice)),
+      rows.length,
       count,
-      total,
     );
   }
 
   async findOne(id: number, userId?: number): Promise<Exercice> {
-    const res = await this.exerciceRepository.findOne<Exercice>({
+    const res = await Exercice.findOne<Exercice>({
       where: { id },
       attributes: { exclude: ['creatorId'] },
       include: [
@@ -61,7 +52,7 @@ export class ExercicesService {
   }
 
   async create(exercice: ExerciceDto): Promise<Exercice> {
-    const res = await this.exerciceRepository.create<Exercice>({ ...exercice });
+    const res = await Exercice.create<Exercice>({ ...exercice });
     return res ? res['dataValues'] : res;
   }
 
@@ -69,35 +60,32 @@ export class ExercicesService {
     id: number,
     exercice: PartialExerciceDto,
   ): Promise<{ affectedCount: number; updatedExercice: Exercice }> {
-    const [affectedCount, [res]] =
-      await this.exerciceRepository.update<Exercice>(exercice, {
-        where: { id },
-        returning: true,
-      });
+    const [affectedCount, [res]] = await Exercice.update<Exercice>(exercice, {
+      where: { id },
+      returning: true,
+    });
     const updatedExercice = res ? res['dataValues'] : res;
     return { affectedCount, updatedExercice };
   }
 
   async delete(id: number): Promise<number> {
-    return await this.exerciceRepository.destroy<Exercice>({ where: { id } });
+    return await Exercice.destroy<Exercice>({ where: { id } });
   }
 
   async getProgress(
     exerciceId: number,
     userId: number,
   ): Promise<ExerciceProgress> {
-    const res = await this.exerciceProgressRepository.findOne<ExerciceProgress>(
-      {
-        where: { exerciceId, userId },
-      },
-    );
+    const res = await ExerciceProgress.findOne<ExerciceProgress>({
+      where: { exerciceId, userId },
+    });
     return res ? res['dataValues'] : res;
   }
 
   async createProgress(
     exerciceProgress: ExerciceProgressDto,
   ): Promise<ExerciceProgress> {
-    const res = await this.exerciceProgressRepository.create<ExerciceProgress>({
+    const res = await ExerciceProgress.create<ExerciceProgress>({
       ...exerciceProgress,
     });
     return res ? res['dataValues'] : res;
@@ -112,16 +100,13 @@ export class ExercicesService {
     updatedExerciceProgress: ExerciceProgress;
   }> {
     const [affectedCount, [res]] =
-      await this.exerciceProgressRepository.update<ExerciceProgress>(
-        exerciceProgress,
-        {
-          where: {
-            exerciceId: exerciceId,
-            userId: userId,
-          },
-          returning: true,
+      await ExerciceProgress.update<ExerciceProgress>(exerciceProgress, {
+        where: {
+          exerciceId: exerciceId,
+          userId: userId,
         },
-      );
+        returning: true,
+      });
     const updatedExerciceProgress = res ? res['dataValues'] : res;
     return { affectedCount, updatedExerciceProgress };
   }

@@ -1,16 +1,12 @@
 import * as bcrypt from 'bcrypt';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  SESSION_REPOSITORY,
-  VERIFICATION_CODE_REPOSITORY,
-} from '../../core/constants';
 import { Session, VerificationCode } from './auth.entity';
 import { User } from '../users/users.entity';
 import { MailerService } from '../../core/mailer/mailer.service';
-import { PartialUserDto, UserDto } from '../users/dto/user.dto';
+import { PartialUserDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,10 +14,6 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
-    @Inject(SESSION_REPOSITORY)
-    private readonly sessionsRepository: typeof Session,
-    @Inject(VERIFICATION_CODE_REPOSITORY)
-    private readonly verificationCodesRepository: typeof VerificationCode,
   ) {}
 
   // session
@@ -31,7 +23,7 @@ export class AuthService {
     expireAt.setSeconds(
       expireAt.getSeconds() + Number(process.env.TOKEN_EXPIRATION),
     );
-    this.sessionsRepository.create({
+    Session.create({
       token,
       userId: user.id,
       expireAt,
@@ -43,7 +35,7 @@ export class AuthService {
   }
 
   public async findOneSession(token: string) {
-    const res = await this.sessionsRepository.findOne({
+    const res = await Session.findOne({
       where: { token },
       include: [{ model: User }],
     });
@@ -51,11 +43,11 @@ export class AuthService {
   }
 
   public async deleteSession(token: string): Promise<void> {
-    await this.sessionsRepository.destroy({ where: { token } });
+    await Session.destroy({ where: { token } });
   }
 
   public async deleteSessionWithUser(user: User): Promise<void> {
-    await this.sessionsRepository.destroy({ where: { userId: user.id } });
+    await Session.destroy({ where: { userId: user.id } });
   }
 
   // session utilities
@@ -87,7 +79,7 @@ export class AuthService {
     expireAt: Date,
     userId: number,
   ): Promise<VerificationCode> {
-    const res = await this.verificationCodesRepository.create({
+    const res = await VerificationCode.create({
       token,
       userId,
       expireAt,
@@ -98,7 +90,7 @@ export class AuthService {
   public async findOneVerificationCode(
     token: string,
   ): Promise<VerificationCode> {
-    const res = await this.verificationCodesRepository.findOne({
+    const res = await VerificationCode.findOne({
       where: { token },
       include: [{ model: User }],
     });
@@ -116,7 +108,7 @@ export class AuthService {
   }
 
   public async deleteVerificationCodeWithUser(userId: number): Promise<void> {
-    await this.verificationCodesRepository.destroy({ where: { userId } });
+    await VerificationCode.destroy({ where: { userId } });
   }
 
   // verification utilities

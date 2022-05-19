@@ -15,12 +15,16 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Req() req: any): Promise<{ user: User; token: string }> {
+  async login(@Req() req: any): Promise<{ user: User; token?: string }> {
     const user = await this.usersService.updateLastLogin(req.user.id);
     const token = await this.authService.createSession(user);
     user.password = undefined;
     user.verificationCode = undefined;
-    return { user, token };
+
+    if (user.isVerified) {
+      return { user, token };
+    }
+    return { user };
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -56,7 +60,7 @@ export class AuthController {
   @Post('verify')
   async verify(
     @Body() payload: { code: string },
-  ): Promise<{ user: User; token: string }> {
+  ): Promise<{ user: User; token?: string }> {
     const user = await this.authService.verify(payload.code);
     return await this.login({ user });
   }

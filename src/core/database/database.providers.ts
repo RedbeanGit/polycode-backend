@@ -1,9 +1,6 @@
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript';
 import { Session, VerificationCode } from '../../modules/auth/auth.entity';
-import {
-  ExerciceSet,
-  ExerciceSetProgress,
-} from '../../modules/exercice-sets/exerciceSets.entity';
+import { ExerciceSet } from '../../modules/exercice-sets/exerciceSets.entity';
 import {
   Exercice,
   ExerciceProgress,
@@ -37,7 +34,6 @@ export const databaseProviders = [
       } as SequelizeOptions);
       sequelize.addModels([
         ExerciceSet,
-        ExerciceSetProgress,
         Exercice,
         ExerciceProgress,
         Session,

@@ -14,8 +14,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { DoesUserExist } from 'src/core/guards/doesUserExist.guard';
-import { Paginated, parseOffsetAndLimit } from 'src/core/pagination';
+import { DoesUserExist } from '../../core/guards/doesUserExist.guard';
+import { Paginated, parseOffsetAndLimit } from '../../core/pagination';
 import { PartialUserDto, UserDto } from './dto/user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -102,6 +102,11 @@ export class UserController {
       }
       if (payload.isAdmin !== undefined) {
         throw new UnauthorizedException('Only admin can update isAdmin field!');
+      }
+      if (payload.isVerified !== undefined) {
+        throw new UnauthorizedException(
+          'Only admin can update isVerified field!',
+        );
       }
     }
 

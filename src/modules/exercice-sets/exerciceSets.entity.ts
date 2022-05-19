@@ -1,6 +1,5 @@
 import {
   BelongsTo,
-  BelongsToMany,
   Column,
   ForeignKey,
   HasMany,
@@ -39,21 +38,4 @@ export class ExerciceSet extends Model {
 
   @HasMany(() => Exercice)
   exercices: Exercice[];
-
-  @BelongsToMany(() => User, () => ExerciceSetProgress)
-  progress: ExerciceSetProgress[];
-}
-
-@Table
-export class ExerciceSetProgress extends Model {
-  @ForeignKey(() => ExerciceSet)
-  @Column
-  exerciceSetId: number;
-
-  @ForeignKey(() => User)
-  @Column
-  userId: number;
-
-  @Column
-  progress: number;
 }
